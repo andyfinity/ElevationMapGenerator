@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+email_address = "anonymous@example.com"
+
 import ftplib
 import re
 import sys
@@ -26,7 +28,7 @@ try:
 
 	# Connect and go to the right directory
 	print("Opening remote connection")
-	with ftplib.FTP('rockyftp.cr.usgs.gov', user='anonymous', passwd='andymrussell777+gis@gmail.com') as ftp:
+	with ftplib.FTP('rockyftp.cr.usgs.gov', user='anonymous', passwd=email_address) as ftp:
 		print("Navigating to the right remote directory")
 		ftp.cwd(remote_path)
 
