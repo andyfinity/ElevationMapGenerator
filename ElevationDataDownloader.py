@@ -9,8 +9,7 @@ import time
 
 parser = argparse.ArgumentParser(description="Read files from the USGS FTP site. Designed for use with the 1/3 arc-second elevation data, but will probably also download other types and resolutions.")
 parser.add_argument('REMOTEDIR',
-	help="directory to read from on the USGS FTP site",
-	default="/vdelivery/Datasets/Staged/Elevation/13/IMG/")
+	help="directory to read from on the USGS FTP site")
 parser.add_argument('LOCALDIR',
 	help="directory to write to on your local computer")
 args = parser.parse_args()
@@ -76,6 +75,7 @@ try:
 except KeyboardInterrupt:
 	print("Terminating download process")
 except ftplib.error_perm as e:
-	print("Permissions error: %s" % e)
+	if not downloading:
+		print("Permissions error: %s" % e)
 except OSError as e:
 	print("OS error: %s" % e)
