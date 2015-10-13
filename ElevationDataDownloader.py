@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-email_address = "anonymous@example.com"
-
 import ftplib
 import re
 import sys
@@ -18,10 +16,14 @@ parser.add_argument('--start-on',
 	help="first file name to download")
 parser.add_argument('--end-on',
 	help="last file name to download")
+parser.add_argument('-e', '--email-address',
+	help="let the server know who you are (probably used for statistics)",
+	default="anonymous@example.com")
 args = parser.parse_args()
 
 remote_path = args.REMOTEDIR.rstrip("/") + '/'
 local_path = os.path.abspath(args.LOCALDIR) + '/'
+email_address = args.email_address
 
 ftp = None
 downloading = False
