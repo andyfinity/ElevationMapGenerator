@@ -12,6 +12,10 @@ parser.add_argument('REMOTEDIR',
 	help="directory to read from on the USGS FTP site")
 parser.add_argument('LOCALDIR',
 	help="directory to write to on your local computer")
+parser.add_argument('--start-on',
+	help="first file name to download")
+parser.add_argument('--end-on',
+	help="last file name to download")
 args = parser.parse_args()
 
 remote_path = args.REMOTEDIR.rstrip("/") + '/'
@@ -35,6 +39,20 @@ try:
 		file_list = ftp.nlst()
 		print("Finding remote files")
 		file_list = [x for x in file_list if re.match(r'^[ns]\d{2}[ew]\d{3}\.zip', x)]
+		if args.start_on:
+			try:
+				first = file_list.index(args.start_on)
+				file_list = file_list[first:]
+			except:
+				raise OSError("Invalid starting file!")
+		if args.end_on:
+			try:
+				last = file_list.index(args.end_on)
+				file_list = file_list[:last+1]
+			except:
+				raise OSError("Invalid ending file.")
+		if len(file_list) == 0:
+			raise OSError("No files to download.")
 
 		# Do a bit of user interaction
 		print("========")
@@ -44,9 +62,9 @@ try:
 		print("========")
 		while True:
 			x = input("Do you want to begin the download? [y/n] ")
-			if x == "y":
+			if x.lower() == "y":
 				break
-			elif x == "n":
+			elif x.lower() == "n":
 				raise KeyboardInterrupt()
 
 		# Download each file
