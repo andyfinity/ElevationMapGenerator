@@ -8,29 +8,33 @@ import argparse
 import time
 
 parser = argparse.ArgumentParser(description="Read files from the USGS FTP site. Designed for use with the 1/3 arc-second elevation data, but will probably also download other types and resolutions.")
-parser.add_argument('REMOTEDIR',
+parser.add_argument('remote-dir',
 	help="directory to read from on the USGS FTP site")
-parser.add_argument('LOCALDIR',
+parser.add_argument('local-dir',
 	help="directory to write to on your local computer")
-parser.add_argument('--start-on',
+parser.add_argument('-s', '--start-on',
 	help="first file name to download")
-parser.add_argument('--end-on',
+parser.add_argument('-e', '--end-on',
 	help="last file name to download")
-parser.add_argument('-e', '--email-address',
-	help="let the server know who you are (probably used for statistics)",
+parser.add_argument('-a', '--email-address',
+	help="let the USGS know who who's downloading so much stuff",
 	default="anonymous@example.com")
+parser.add_argument('-r', '--regex',
+	help="select which files to download",
+	default=r"^[ns]\d{2}[ew]\d{3}\.zip")
 args = parser.parse_args()
 
-remote_path = args.REMOTEDIR.rstrip("/") + '/'
-local_path = os.path.abspath(args.LOCALDIR) + '/'
+remote_path = args.remote_dir.rstrip("/") + '/'
+local_path = os.path.abspath(args.local_dir) + '/'
 email_address = args.email_address
+file_name_regex = args.regex
 
 ftp = None
 downloading = False
 
 try:
 	if not os.path.exists(local_path):
-		raise OSError("LOCALDIR does not exist.")
+		raise OSError("The path \"%s\" does not exist." % local_path)
 
 	# Connect and go to the right directory
 	print("Opening remote connection")
@@ -42,7 +46,7 @@ try:
 		print("Getting remote file list")
 		file_list = ftp.nlst()
 		print("Finding remote files")
-		file_list = [x for x in file_list if re.match(r'^[ns]\d{2}[ew]\d{3}\.zip', x)]
+		file_list = [x for x in file_list if re.match(file_name_regex, x)]
 		if args.start_on:
 			try:
 				first = file_list.index(args.start_on)
